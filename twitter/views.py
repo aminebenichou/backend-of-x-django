@@ -4,7 +4,18 @@ from rest_framework.response import Response
 from .models import *
 from .serializer import *
 from rest_framework import status, viewsets
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 # Create your views here.
+
+def CreateUser(data):
+    print(data)
+    try:
+        user = User.objects.create_user(**data)
+    except NameError:
+        print(NameError)
+    return user
+
 @api_view(['GET', 'POST', 'Delete', 'PATCH'])
 def PostView(request):
     if request.method == 'POST':
@@ -40,7 +51,22 @@ def PostView(request):
 class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
+    authentication_classes = [SessionAuthentication, BasicAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def create(self, request, *args, **kwargs):
+        self.queryset.create(title=request.data['title'], 
+                             content=request.data['content'],
+                             owner=request.user)
+        return Response({'message': 'Post created'}, status=status.HTTP_201_CREATED)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def create(self, request, *args, **kwargs):
+        user = CreateUser(request.data)
+        if user is not None:
+            return Response({'user': user.username}, status=status.HTTP_201_CREATED)
+        return Response({'error': 'User not created'}, status=status.HTTP_400_BAD_REQUEST)
+        
