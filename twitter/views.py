@@ -7,7 +7,7 @@ from rest_framework import status, viewsets
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 # Create your views here.
-
+# DahliasInstitute2022
 def CreateUser(data):
     print(data)
     try:
@@ -52,7 +52,7 @@ class PostViewSet(viewsets.ModelViewSet):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     authentication_classes = [SessionAuthentication, BasicAuthentication]
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
     def create(self, request, *args, **kwargs):
         self.queryset.create(title=request.data['title'], 
@@ -69,4 +69,9 @@ class UserViewSet(viewsets.ModelViewSet):
         if user is not None:
             return Response({'user': user.username}, status=status.HTTP_201_CREATED)
         return Response({'error': 'User not created'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+class CommentViewSet(viewsets.ModelViewSet):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    
